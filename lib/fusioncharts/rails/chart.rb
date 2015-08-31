@@ -84,11 +84,12 @@ module Fusioncharts
 
       # Render the chart
       def render
-        config = json_escape JSON.generate(self.options)
-        dataUrlFormat = self.jsonUrl? ? "json" : ( self.xmlUrl ? "xml" : nil )
-        template = File.read(File.expand_path("../../../templates/chart.erb", __FILE__))
-        renderer = ERB.new(template)
-        raw renderer.result(binding)
+        render_template(templates_path("chart.html.erb"))
+      end
+
+      # Render the chart as javascript
+      def js_render
+        render_template(templates_path("chart.js.erb"))
       end
 
       private
@@ -123,6 +124,17 @@ module Fusioncharts
         str.to_s.gsub('/', '\/')
       end
 
+      def templates_path(file)
+        "../../../templates/#{file}"
+      end
+
+      def render_template(path)
+        config = json_escape JSON.generate(self.options)
+        dataUrlFormat = self.jsonUrl? ? "json" : ( self.xmlUrl ? "xml" : nil )
+        template = File.read(File.expand_path(path, __FILE__))
+        renderer = ERB.new(template)
+        raw renderer.result(binding)
+      end
     end
 
 end
